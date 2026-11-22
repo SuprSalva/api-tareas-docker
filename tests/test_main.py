@@ -32,7 +32,12 @@ def test_listar_vacio():
 def test_crear_tarea():
     respuesta = client.post("/tareas", json={"titulo": "Estudiar Docker"})
     assert respuesta.status_code == 201
-    assert respuesta.json() == {"id": 1, "titulo": "Estudiar Docker", "completada": False}
+    assert respuesta.json() == {
+        "id": 1,
+        "titulo": "Estudiar Docker",
+        "completada": False,
+        "prioridad": "media",
+    }
 
 
 def test_obtener_tarea():
@@ -68,3 +73,13 @@ def test_estado():
     assert datos["estado"] == "activo"
     assert datos["version"] == main.APP_VERSION
     assert datos["tareas_registradas"] == 1
+
+
+def test_crear_tarea_con_prioridad():
+    respuesta = client.post("/tareas", json={"titulo": "Entregar", "prioridad": "alta"})
+    assert respuesta.status_code == 201
+    assert respuesta.json()["prioridad"] == "alta"
+
+
+def test_prioridad_invalida():
+    assert client.post("/tareas", json={"titulo": "X", "prioridad": "urgente"}).status_code == 422

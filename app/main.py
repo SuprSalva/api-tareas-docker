@@ -1,9 +1,10 @@
 from datetime import datetime, timezone
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-APP_VERSION = "1.0.0"
+APP_VERSION = "2.0.0"
 
 app = FastAPI(title="API de tareas", version=APP_VERSION)
 
@@ -15,6 +16,7 @@ inicio = datetime.now(timezone.utc)
 class TareaEntrada(BaseModel):
     titulo: str
     completada: bool = False
+    prioridad: Literal["baja", "media", "alta"] = "media"
 
 
 @app.get("/")
@@ -39,6 +41,7 @@ def estado():
         "version": APP_VERSION,
         "tareas_registradas": len(tareas),
         "en_linea_desde": inicio.isoformat(),
+        "novedades": ["Campo prioridad en tareas (baja, media, alta)"],
     }
 
 
