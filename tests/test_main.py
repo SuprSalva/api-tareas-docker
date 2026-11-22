@@ -54,3 +54,17 @@ def test_eliminar_tarea():
     client.post("/tareas", json={"titulo": "Borrar"})
     assert client.delete("/tareas/1").status_code == 204
     assert client.get("/tareas/1").status_code == 404
+
+
+def test_version():
+    respuesta = client.get("/version")
+    assert respuesta.status_code == 200
+    assert respuesta.json() == {"api": "API de tareas", "version": main.APP_VERSION}
+
+
+def test_estado():
+    client.post("/tareas", json={"titulo": "Contar"})
+    datos = client.get("/estado").json()
+    assert datos["estado"] == "activo"
+    assert datos["version"] == main.APP_VERSION
+    assert datos["tareas_registradas"] == 1

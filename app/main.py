@@ -1,10 +1,15 @@
+from datetime import datetime, timezone
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-app = FastAPI(title="API de tareas")
+APP_VERSION = "1.0.0"
+
+app = FastAPI(title="API de tareas", version=APP_VERSION)
 
 tareas: dict[int, dict] = {}
 siguiente_id = 1
+inicio = datetime.now(timezone.utc)
 
 
 class TareaEntrada(BaseModel):
@@ -20,6 +25,21 @@ def raiz():
 @app.get("/salud")
 def salud():
     return {"estado": "ok"}
+
+
+@app.get("/version")
+def version():
+    return {"api": app.title, "version": APP_VERSION}
+
+
+@app.get("/estado")
+def estado():
+    return {
+        "estado": "activo",
+        "version": APP_VERSION,
+        "tareas_registradas": len(tareas),
+        "en_linea_desde": inicio.isoformat(),
+    }
 
 
 @app.get("/tareas")
